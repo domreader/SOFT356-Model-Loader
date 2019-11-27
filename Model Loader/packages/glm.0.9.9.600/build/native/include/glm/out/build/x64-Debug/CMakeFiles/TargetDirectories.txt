@@ -1,0 +1,2 @@
+C:/Users/dgreader.SOCNET/Documents/GitHub/SOFT356-Model-Loader/Model Loader/packages/glm.0.9.9.600/build/native/include/glm/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/dgreader.SOCNET/Documents/GitHub/SOFT356-Model-Loader/Model Loader/packages/glm.0.9.9.600/build/native/include/glm/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
