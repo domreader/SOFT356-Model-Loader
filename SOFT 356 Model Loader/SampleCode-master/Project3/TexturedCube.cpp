@@ -113,16 +113,19 @@ void loadFile(vector<GLfloat> & outVertices, vector<GLfloat> & outTextures, vect
 				
 				replace(line.begin(), line.end(), '/', ' ');  //Replacing the / with _ to make seperating easier
 
-
+				GLuint tempVertices, tempNormals, tempTextures;
 				GLuint vertexIndex[4], textureIndex[4], normalIndex[4], num;
 				istringstream data(line.substr(2));
 				
 				data >> num;
 				vertexIndex[0] = num;
+			
 				data >> num;
 				textureIndex[0] = num;
+			
 				data >> num;
 				normalIndex[0] = num;
+			
 
 				data >> num;
 				vertexIndex[1] = num;
@@ -133,10 +136,13 @@ void loadFile(vector<GLfloat> & outVertices, vector<GLfloat> & outTextures, vect
 
 				data >> num;
 				vertexIndex[2] = num;
+	
 				data >> num;
 				textureIndex[2] = num;
+				
 				data >> num;
 				normalIndex[2] = num;
+				
 
 				data >> num;
 				vertexIndex[3] = num;
@@ -150,13 +156,34 @@ void loadFile(vector<GLfloat> & outVertices, vector<GLfloat> & outTextures, vect
 				cout << vertexIndex[2] << "/" << textureIndex[2] << "/" << normalIndex[2] << endl;
 				cout << vertexIndex[3] << "/" << textureIndex[3] << "/" << normalIndex[3] << endl;*/
 
-				for (int i = 0; i < 4; i++)  // Adding to relevant arrays, looping through for ease
-				{
-					vIndices.push_back(vertexIndex[i]);
-					tIndices.push_back(textureIndex[i]);
-					nIndices.push_back(normalIndex[i]);
+				
+					vIndices.push_back(vertexIndex[0]);
+					tIndices.push_back(textureIndex[0]);
+					nIndices.push_back(normalIndex[0]);
 
-				}
+					vIndices.push_back(vertexIndex[1]);
+					tIndices.push_back(textureIndex[1]);
+					nIndices.push_back(normalIndex[1]);	
+
+					vIndices.push_back(vertexIndex[2]);
+					tIndices.push_back(textureIndex[2]);
+					nIndices.push_back(normalIndex[2]);
+
+					vIndices.push_back(vertexIndex[0]);
+					tIndices.push_back(textureIndex[0]);
+					nIndices.push_back(normalIndex[0]);
+
+					vIndices.push_back(vertexIndex[2]);
+					tIndices.push_back(textureIndex[2]);
+					nIndices.push_back(normalIndex[2]);	
+
+					vIndices.push_back(vertexIndex[3]);
+					tIndices.push_back(textureIndex[3]);
+					nIndices.push_back(normalIndex[3]);
+
+					
+
+				
 
 				//cout << vertexIndex[0] << "/" << textureIndex[0] << "/" << normalIndex[0] << endl;
 
@@ -260,8 +287,8 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	
 
@@ -363,7 +390,8 @@ display(void)
 
 	glBindVertexArray(VAOs[Triangles]);
 	glBindTexture(GL_TEXTURE_2D, texture1);
-	glDrawElements(GL_TRIANGLES, NumVertices, GL_UNSIGNED_INT, 0);
+	/*glDrawElements(GL_TRIANGLES, NumVertices, GL_UNSIGNED_INT, 0);
+*/glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 
 	
 }
