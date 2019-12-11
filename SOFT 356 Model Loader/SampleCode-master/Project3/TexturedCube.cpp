@@ -41,11 +41,11 @@ GLuint texture1;
 
 const GLuint  NumVertices = 36;
 
-void loadFile(vector<GLfloat> & outVertices, vector<GLfloat> & outTextures, vector<GLfloat> & outNormals)
+void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> & outTextures, vector<GLfloat> & outNormals)
 {
 
 	string line;
-	ifstream myFile("media/Creeper.obj"); // Reading in specific file, hardcoded for ease
+	ifstream myFile("media/"+ file_name + ".obj"); // Reading in specific file, hardcoded for ease
 	vector<GLfloat> vertices;
 	vector<GLfloat> textures;
 	vector<GLfloat> normals;
@@ -196,7 +196,7 @@ void loadFile(vector<GLfloat> & outVertices, vector<GLfloat> & outTextures, vect
 	for (GLint i = 0; i < vIndices.size(); i++) {
 	
 		GLint vertexIndex = (vIndices[i] - 1) * 3;
-		GLint textureIndex = (tIndices[i] - 1) * 2;
+		//GLint textureIndex = (tIndices[i] - 1) * 2;
 		GLint normalIndex = (nIndices[i] - 1) * 3;
 
 		/*cout << vIndices[i] << "/" << tIndices[i] << "/" << nIndices[i] << endl;*/
@@ -205,12 +205,30 @@ void loadFile(vector<GLfloat> & outVertices, vector<GLfloat> & outTextures, vect
 		outVertices.push_back(vertices[vertexIndex + 1]);
 		outVertices.push_back(vertices[vertexIndex + 2]);
 		
-		outTextures.push_back(textures[textureIndex]);
-		outTextures.push_back(textures[textureIndex + 1]);
+		//outTextures.push_back(textures[textureIndex]);
+		//outTextures.push_back(textures[textureIndex + 1]);
 
 		outNormals.push_back(normals[normalIndex]);
 		outNormals.push_back(normals[normalIndex + 1]);
 		outNormals.push_back(normals[normalIndex + 2]);
+
+
+	}
+
+	for (GLint i = 0; i < tIndices.size(); i++) {
+
+		
+		GLint textureIndex = (tIndices[i] - 1) * 2;
+		
+
+		/*cout << vIndices[i] << "/" << tIndices[i] << "/" << nIndices[i] << endl;*/
+
+		
+
+		outTextures.push_back(textures[textureIndex]);
+		outTextures.push_back(textures[textureIndex + 1]);
+
+	
 
 
 	}
@@ -384,9 +402,9 @@ display(void)
 	glClearBufferfv(GL_COLOR, 0, black);
 	glClear(GL_COLOR_BUFFER_BIT);
 	// bind textures on corresponding texture units
-	glFrontFace(GL_CW);
+	//glFrontFace(GL_CW);
 	// glCullFace(GL_BACK);
-	// glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	glBindVertexArray(VAOs[Triangles]);
 	glBindTexture(GL_TEXTURE_2D, texture1);
@@ -397,11 +415,11 @@ display(void)
 }
 
 void
-loadMTLFile(vector<GLfloat> & colour, vector<GLfloat> & diffuse, vector<GLfloat> & specular, GLfloat & ns, string& texture_name)
+loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffuse, vector<GLfloat> & specular, GLfloat & ns, string& texture_name)
 {
 
 	string line;
-	ifstream myFile("media/Creeper.mtl"); // Reading in specific file, hardcoded for ease
+	ifstream myFile("media/" + file_name + ".mtl"); // Reading in specific file, hardcoded for ease
 	GLfloat transparency = -1;
 
 
@@ -532,9 +550,13 @@ main(int argc, char** argv)
 	GLfloat ns; //Specular Exponent
 	string texture_name;
 
+	string file_name;
 
-	loadFile(vertices, textures, normals);
-	loadMTLFile(colour, diffuse, specular, ns, texture_name);
+	cin >> file_name;
+
+
+	loadFile(file_name, vertices, textures, normals);
+	loadMTLFile(file_name, colour, diffuse, specular, ns, texture_name);
 	
 	glfwInit();
 	
