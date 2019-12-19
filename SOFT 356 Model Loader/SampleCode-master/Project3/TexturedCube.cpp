@@ -45,7 +45,7 @@ void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> &
 {
 
 	string line;
-	ifstream myFile("media/"+ file_name + ".obj"); // Reading in specific file, hardcoded for ease
+	ifstream myFile("media/"+ file_name + ".obj"); // Reading in specific file, originally hardcoded but typing creeper brings up texture
 	vector<GLfloat> vertices;
 	vector<GLfloat> textures;
 	vector<GLfloat> normals;
@@ -117,7 +117,7 @@ void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> &
 				GLuint vertexIndex[4], textureIndex[4], normalIndex[4], num;
 				istringstream data(line.substr(2));
 				
-				data >> num;
+				data >> num;		//pushing vertex, textures, normals back first time
 				vertexIndex[0] = num;
 			
 				data >> num;
@@ -127,14 +127,14 @@ void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> &
 				normalIndex[0] = num;
 			
 
-				data >> num;
+				data >> num;		//pushing vertex, textures, normals back second time
 				vertexIndex[1] = num;
 				data >> num;
 				textureIndex[1] = num;
 				data >> num;
 				normalIndex[1] = num;
 
-				data >> num;
+				data >> num;		//pushing vertex, textures, normals back third time
 				vertexIndex[2] = num;
 	
 				data >> num;
@@ -144,20 +144,20 @@ void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> &
 				normalIndex[2] = num;
 				
 
-				data >> num;
+				data >> num;		//pushing vertex, textures, normals back fourth time
 				vertexIndex[3] = num;
 				data >> num;
 				textureIndex[3] = num;
 				data >> num;
 				normalIndex[3] = num;
 
-				/*cout << vertexIndex[0] << "/" << textureIndex[0] << "/" << normalIndex[0] << endl;
-				cout << vertexIndex[1] << "/" << textureIndex[1] << "/" << normalIndex[1] << endl;
-				cout << vertexIndex[2] << "/" << textureIndex[2] << "/" << normalIndex[2] << endl;
-				cout << vertexIndex[3] << "/" << textureIndex[3] << "/" << normalIndex[3] << endl;*/
+				//cout << vertexIndex[0] << "/" << textureIndex[0] << "/" << normalIndex[0] << endl;	//printing values to make sure everything working correctly, commented out after making sure.
+				//cout << vertexIndex[1] << "/" << textureIndex[1] << "/" << normalIndex[1] << endl;
+				//cout << vertexIndex[2] << "/" << textureIndex[2] << "/" << normalIndex[2] << endl;
+				//cout << vertexIndex[3] << "/" << textureIndex[3] << "/" << normalIndex[3] << endl;*/
 
 				
-					vIndices.push_back(vertexIndex[0]);
+					vIndices.push_back(vertexIndex[0]);	//
 					tIndices.push_back(textureIndex[0]);
 					nIndices.push_back(normalIndex[0]);
 
@@ -196,18 +196,13 @@ void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> &
 	for (GLint i = 0; i < vIndices.size(); i++) {
 	
 		GLint vertexIndex = (vIndices[i] - 1) * 3;
-		//GLint textureIndex = (tIndices[i] - 1) * 2;
 		GLint normalIndex = (nIndices[i] - 1) * 3;
 
-		/*cout << vIndices[i] << "/" << tIndices[i] << "/" << nIndices[i] << endl;*/
 
 		outVertices.push_back(vertices[vertexIndex]);
 		outVertices.push_back(vertices[vertexIndex + 1]);
 		outVertices.push_back(vertices[vertexIndex + 2]);
 		
-		//outTextures.push_back(textures[textureIndex]);
-		//outTextures.push_back(textures[textureIndex + 1]);
-
 		outNormals.push_back(normals[normalIndex]);
 		outNormals.push_back(normals[normalIndex + 1]);
 		outNormals.push_back(normals[normalIndex + 2]);
@@ -215,22 +210,13 @@ void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> &
 
 	}
 
-	for (GLint i = 0; i < tIndices.size(); i++) {
-
-		
+	for (GLint i = 0; i < tIndices.size(); i++) {		//For loop for pushing textures back as did not work for some reason in the loop above
+	
 		GLint textureIndex = (tIndices[i] - 1) * 2;
-		
-
-		/*cout << vIndices[i] << "/" << tIndices[i] << "/" << nIndices[i] << endl;*/
-
-		
 
 		outTextures.push_back(textures[textureIndex]);
 		outTextures.push_back(textures[textureIndex + 1]);
-
 	
-
-
 	}
 }
 
@@ -304,9 +290,6 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 	
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	
 
@@ -415,11 +398,11 @@ display(void)
 }
 
 void
-loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffuse, vector<GLfloat> & specular, GLfloat & ns, string& texture_name)
+loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffuse, vector<GLfloat> & specular, GLfloat & ns, string& texture_name) //Loading Material file
 {
 
 	string line;
-	ifstream myFile("media/" + file_name + ".mtl"); // Reading in specific file, hardcoded for ease
+	ifstream myFile("media/" + file_name + ".mtl"); // Reading in specific file
 	GLfloat transparency = -1;
 
 
@@ -432,7 +415,7 @@ loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffus
 		{
 			std::cout << line << std::endl;
 
-			if (line[0] == 'K' && line[1] == 'a') 
+			if (line[0] == 'K' && line[1] == 'a') //Seperating based on K and A
 			{
 				
 				istringstream data(line.substr(2));
@@ -452,7 +435,7 @@ loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffus
 			}
 			else
 				
-			if (line[0] == 'd' && line[1] == ' ')
+			if (line[0] == 'd' && line[1] == ' ') //Seperating based on D and _
 			{
 
 				istringstream data(line.substr(2));
@@ -469,7 +452,7 @@ loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffus
 			}
 			else
 
-			if (line[0] == 'K' && line[1] == 'd') 
+			if (line[0] == 'K' && line[1] == 'd') //Seperating based on K and D
 			{
 
 
@@ -485,7 +468,7 @@ loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffus
 			}
 			else
 
-			if (line[0] == 'K' && line[1] == 's') 
+			if (line[0] == 'K' && line[1] == 's') //Seperating based on K and S
 			{
 
 				istringstream data(line.substr(2));
@@ -523,7 +506,7 @@ loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffus
 
 		}
 
-		texture_name = "media/textures/" + texture_name;
+		texture_name = "media/textures/" + texture_name; //Name of texture
 		
 
 	}
