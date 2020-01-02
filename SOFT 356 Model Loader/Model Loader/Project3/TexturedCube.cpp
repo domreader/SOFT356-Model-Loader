@@ -38,9 +38,33 @@ enum Attrib_IDs { vPosition = 0, cPosition = 1, tPosition = 2 };
 GLuint  VAOs[NumVAOs];
 GLuint  Buffers[NumBuffers];
 GLuint texture1;
+GLuint texture2;
 
 const GLuint  NumVertices = 36;
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void processInput(GLFWwindow* window);
 
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
+// camera
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+float lastX = 800.0f / 2.0;
+float lastY = 600.0 / 2.0;
+float fov = 45.0f;
+
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
 void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> & outTextures, vector<GLfloat> & outNormals)
 {
 
@@ -190,6 +214,7 @@ void loadFile(string file_name, vector<GLfloat> & outVertices, vector<GLfloat> &
 			}
 
 		}
+		// Lighting
 		
 	}
 
@@ -244,6 +269,7 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 	glUseProgram(program);
 
 
+
 	GLuint indices[][3] = {  // note that we start from 0!
 		{0, 3, 1},  // first Triangle front
 		{3, 2, 1},   // second Triangle
@@ -286,6 +312,7 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 
 
 
+
 	glGenBuffers(NumBuffers, Buffers);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
@@ -313,32 +340,39 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 	loadTexture(texture1, texture_name);
 	glUniform1i(glGetUniformLocation(program, "texture1"), 0);
 
+	loadTexture(texture2, texture_name);
+	glUniform1i(glGetUniformLocation(program, "texture2"), 0);
+
 	// creating the model matrix
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-	model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
+	model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(1.0f, 0.5f, 0.5f));
+	
 
 	// creating the view matrix
-	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
+	glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 	// creating the projection matrix
-	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3, 0.1f, 20.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 	// Adding all matrices up to create combined matrix
-	glm::mat4 mvp = projection * view * model;
+	glm::mat4 mv =  view * model;
 
 
 	//adding the Uniform to the shader
-	int mvpLoc = glGetUniformLocation(program, "mvp");
-	glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+	int mvLoc = glGetUniformLocation(program, "mvp");
+	glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mv));
+
+	int pLoc = glGetUniformLocation(shader, "p_matrix");
+	glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(projection))
 
 	glEnableVertexAttribArray(vPosition);
 	glEnableVertexAttribArray(cPosition); 
 	glEnableVertexAttribArray(tPosition);
 }
 
+
+ 
 void loadTexture(GLuint &texture, std::string texturepath)
 {
 	// load and create a texture 
@@ -371,16 +405,22 @@ void loadTexture(GLuint &texture, std::string texturepath)
 }
 
 
+
+
 //----------------------------------------------------------------------------
 //
 // display
 //
+
+	
+
 
 
 void
 display(void)
 {
 	static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
 
 	glClearBufferfv(GL_COLOR, 0, black);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -394,8 +434,20 @@ display(void)
 	/*glDrawElements(GL_TRIANGLES, NumVertices, GL_UNSIGNED_INT, 0);
 */glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 
+
+	glBindVertexArray(VAOs[Triangles]);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	/*glDrawElements(GL_TRIANGLES, NumVertices, GL_UNSIGNED_INT, 0);
+*/glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+
 	
+
+
+
 }
+
+
+
 
 void
 loadMTLFile(string file_name, vector<GLfloat> & colour, vector<GLfloat> & diffuse, vector<GLfloat> & specular, GLfloat & ns, string& texture_name) //Loading Material file
@@ -546,6 +598,14 @@ main(int argc, char** argv)
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Textured Cube", NULL, NULL);
 
 	glfwMakeContextCurrent(window);
+
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+
+	// tell GLFW to capture our mouse
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	glewInit();
 
 	init(vertices, textures, normals, texture_name);
@@ -555,12 +615,106 @@ main(int argc, char** argv)
 		// uncomment to draw only wireframe 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		
+
+		processInput(window);
+
+
 		display();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+
+		
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+
+		processInput(window);
+
 	}
+
+	
 
 	glfwDestroyWindow(window);
 
 	glfwTerminate();
+
+
+
+
+}
+
+void processInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+	float cameraSpeed = 2.5 * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	// make sure the viewport matches the new window dimensions; note that width and 
+	// height will be significantly larger than specified on retina displays.
+	glViewport(0, 0, width, height);
+}
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.1f; // change this value to your liking
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(front);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	if (fov >= 1.0f && fov <= 45.0f)
+		fov -= yoffset;
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= 45.0f)
+		fov = 45.0f;
 }
