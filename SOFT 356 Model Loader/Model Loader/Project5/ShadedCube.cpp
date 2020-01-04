@@ -577,9 +577,17 @@ display(GLfloat delta)
 
 
 
-
 	glBindVertexArray(VAOs[Cube]);
 	glBindTexture(GL_TEXTURE_2D, texture1);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	
+	model = glm::rotate(model, glm::radians(delta), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(1.0f, 1.0f, 1.0f));
+	projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	mv = view * model;
+	glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mv));
+	glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 
 }
@@ -657,6 +665,8 @@ void processInput(GLFWwindow* window)
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	
+	
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
