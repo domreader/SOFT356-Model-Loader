@@ -11,8 +11,8 @@ out vec2 TexCoord;
 void
 main()
 {
-	gl_Position = mvp * vec4(vPosition, 1.0f);
+    gl_Position = mvp * vec4 (vPosition,1.0);
 	fragColour = vec4(0.5, 0.4, 0.8, 1.0);
 	fragColour = vColour;
-	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+	TexCoord = aTexCoord;
 }
