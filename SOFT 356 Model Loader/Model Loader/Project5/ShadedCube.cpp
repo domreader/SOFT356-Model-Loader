@@ -399,6 +399,8 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 	GLuint dLightLoc = glGetUniformLocation(shader, "dLight");
 	glUniform3fv(dLightLoc, 1, glm::value_ptr(diffuseLight));
 	
+
+
 	// specular light
 	glm::vec3 specularLight = glm::vec3(specular[0], specular[1], specular[2]);
 	GLfloat shininess = ns; //128 is max value
@@ -478,7 +480,7 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load image, create texture and generate mipmaps
 	GLint width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(false); // tell stb_image.h to flip loaded texture's on the y-axis.
+	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
 	unsigned char* data = stbi_load(texture_name.c_str(), &width, &height, &nrChannels, 0);
 	if (data)
 	{
@@ -549,8 +551,8 @@ display(GLfloat delta)
 
 	// bind textures on corresponding texture units
 	//glFrontFace(GL_CW);
-	//glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
+	// glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
 	// creating the model matrix
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
@@ -614,48 +616,56 @@ main(int argc, char** argv)
 
 	string file_name;
 
-	cin >> file_name;
+	cout << "Please enter file name" << endl;
+	cout << "Available file : Creeper" << endl;
 
-
-	loadFile(file_name, vertices, textures, normals);
-	loadMTLFile(file_name, colour, diffuse, specular, ns, texture_name);
-	glfwInit();
-
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Shaded Cube", NULL, NULL);
-
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-
-	// tell GLFW to capture our mouse
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glewInit();
-
-	init(vertices, textures, normals, texture_name, colour, diffuse, specular, ns);
-	GLfloat timer= 0.0f;
-	while (!glfwWindowShouldClose(window))
+	while(true)
 	{
-		// uncomment to draw only wireframe 
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		processInput(window);
 
-		display(timer);
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-		timer += 0.1f;
+		cin >> file_name;
+		loadFile(file_name, vertices, textures, normals);
+		loadMTLFile(file_name, colour, diffuse, specular, ns, texture_name);
+		glfwInit();
+
+		GLFWwindow* window = glfwCreateWindow(800, 600, "Shaded Cube", NULL, NULL);
+		glfwMakeContextCurrent(window);
+		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+		glfwSetCursorPosCallback(window, mouse_callback);
+		glfwSetScrollCallback(window, scroll_callback);
+
+		// tell GLFW to capture our mouse
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glewInit();
+
+		init(vertices, textures, normals, texture_name, colour, diffuse, specular, ns);
+		GLfloat timer = 0.0f;
+		while (!glfwWindowShouldClose(window))
+		{
+
+			processInput(window);
+
+			display(timer);
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+			timer += 0.1f;
+
+
+		}
+
+		glfwDestroyWindow(window);
+		
 	}
-
-	glfwDestroyWindow(window);
-
-	glfwTerminate();
 }
 
 void processInput(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
 
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true),
+		cout << "Thank you for using the model loader today!" << endl,
+		cout << "Type Creeper to re-load or press n to close" << endl;
+	
+	
 	float cameraSpeed = 2.5 * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cameraPos += cameraSpeed * cameraFront;
@@ -665,7 +675,11 @@ void processInput(GLFWwindow* window)
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	
+
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	
 }
 

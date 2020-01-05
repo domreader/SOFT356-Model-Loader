@@ -39,6 +39,7 @@
     <ProjectGuid>{277E2F6A-0C0B-4E44-A37F-D2FC95779F63}</ProjectGuid>
     <RootNamespace>Project5</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Model Loader</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
