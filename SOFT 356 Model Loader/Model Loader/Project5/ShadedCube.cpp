@@ -8,7 +8,7 @@
 #include "GL/freeglut.h"
 #include "GLFW/glfw3.h"
 #include "LoadShaders.h"
-#include <glm/glm.hpp> //includes GML
+#include <glm/glm.hpp> //includes GLM
 #include <glm/ext/matrix_transform.hpp> // GLM: translate, rotate
 #include <glm/ext/matrix_clip_space.hpp> // GLM: perspective and ortho 
 #include <glm/gtc/type_ptr.hpp> // GLM: access to the value_ptr
@@ -327,7 +327,7 @@ loadMTLFile(string file_name, vector<GLfloat>& colour, vector<GLfloat>& diffuse,
 						}
 						else
 
-							if (line[0] == 'N' && line[1] == 's')
+							if (line[0] == 'N' && line[1] == 's') //Seperating based on N and S
 							{
 
 
@@ -368,7 +368,7 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 	glGenVertexArrays(NumVAOs, VAOs);
 	glBindVertexArray(VAOs[Cube]);
 
-	ShaderInfo  shaders[] =
+	ShaderInfo  shaders[] = // Loading Shaders in
 	{
 		{ GL_VERTEX_SHADER, "media/triangles.vert" },
 		{ GL_FRAGMENT_SHADER, "media/triangles.frag" },
@@ -382,35 +382,35 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
     // configuring lighting
     //
 
-    // ambient light
-	glm::vec4 ambient = glm::vec4(colour[0], colour[1], colour[2], colour[3]);
+    // ambient light - Seen in project 5 after struggling with the initial implementation
+	glm::vec4 ambient = glm::vec4(colour[0], colour[1], colour[2], colour[3]); // Reading the colour values into a Vec4
 	//adding the Uniform to the shader
 	GLuint aLoc = glGetUniformLocation(shader, "ambient");
 	glUniform4fv(aLoc, 1, glm::value_ptr(ambient));
 
 	// light object
-	glm::vec3 lightPos = glm::vec3(100.0f, 25.0f, 100.0f);
+	glm::vec3 lightPos = glm::vec3(100.0f, 25.0f, 100.0f); // Adding Light values in
 	GLuint dLightPosLoc = glGetUniformLocation(shader, "lightPos");
 	glUniform3fv(dLightPosLoc, 1, glm::value_ptr(lightPos));
 
 
 	// diffuse light
-	glm::vec3 diffuseLight = glm::vec3(diffuse[0], diffuse[1], diffuse[2]);
+	glm::vec3 diffuseLight = glm::vec3(diffuse[0], diffuse[1], diffuse[2]); // Reading diffuse into Vec3
 	GLuint dLightLoc = glGetUniformLocation(shader, "dLight");
 	glUniform3fv(dLightLoc, 1, glm::value_ptr(diffuseLight));
 	
 
 
 	// specular light
-	glm::vec3 specularLight = glm::vec3(specular[0], specular[1], specular[2]);
-	GLfloat shininess = ns; //128 is max value
-	GLuint sLightLoc = glGetUniformLocation(shader, "sLight");
-	GLuint sShineLoc = glGetUniformLocation(shader, "sShine");
+	glm::vec3 specularLight = glm::vec3(specular[0], specular[1], specular[2]); //Reading Specular into Vec3
+	GLfloat shininess = ns; //128 is max value - Setting the Specular Exponent
+	GLuint sLightLoc = glGetUniformLocation(shader, "sLight"); // Geting uniform for specular light
+	GLuint sShineLoc = glGetUniformLocation(shader, "sShine"); // Getting uniform for Shininess
 	glUniform3fv(sLightLoc, 1, glm::value_ptr(specularLight));
 	glUniform1fv(sShineLoc, 1, &shininess);
 
 
-	// setting up the cube
+	// setting up the colours
 
 	GLfloat  colours[][4] = {
 		{ 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f },
@@ -451,7 +451,7 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
 
-	//Colour Binding
+	//Normal Binding
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Normals]);
 	glBufferStorage(GL_ARRAY_BUFFER, normals.size() * sizeof(GLfloat), normals.data(), 0);
 
@@ -520,10 +520,6 @@ init(vector<GLfloat>& vertices, vector<GLfloat>& textures, vector<GLfloat>& norm
 	int pLoc = glGetUniformLocation(shader, "p_matrix");
 	glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-
-
-
-
 	glEnableVertexAttribArray(Triangles);
 	glEnableVertexAttribArray(Colours); 
 	glEnableVertexAttribArray(Textures);
@@ -579,9 +575,9 @@ display(GLfloat delta)
 
 
 
-	glBindVertexArray(VAOs[Cube]);
+	glBindVertexArray(VAOs[Cube]);	
 	glBindTexture(GL_TEXTURE_2D, texture1);
-	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices); // Draw first shape
 	
 	model = glm::rotate(model, glm::radians(delta), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::translate(model, glm::vec3(1.0f, 1.0f, 1.0f));
@@ -590,7 +586,7 @@ display(GLfloat delta)
 	glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mv));
 	glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices); // Draw Second Shape
 
 }
 
@@ -617,9 +613,9 @@ main(int argc, char** argv)
 	string file_name;
 
 	cout << "Please enter file name" << endl;
-	cout << "Available file : Creeper" << endl;
+	cout << "Available file : creeper" << endl;
 
-	while(true)
+	while(true) // While loop for loading in file on name entry, Displaying, Allowing User Input
 	{
 
 		cin >> file_name;
@@ -627,8 +623,9 @@ main(int argc, char** argv)
 		loadMTLFile(file_name, colour, diffuse, specular, ns, texture_name);
 		glfwInit();
 
-		GLFWwindow* window = glfwCreateWindow(800, 600, "Shaded Cube", NULL, NULL);
-		glfwMakeContextCurrent(window);
+		GLFWwindow* window = glfwCreateWindow(800, 600, "Shaded Cube", NULL, NULL); // Loading Window
+
+		glfwMakeContextCurrent(window); //Making sure that can have User Input
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
 		glfwSetScrollCallback(window, scroll_callback);
@@ -637,9 +634,13 @@ main(int argc, char** argv)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glewInit();
 
+		cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);	//Resetting Camera each time scene re-opens
+		cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 		init(vertices, textures, normals, texture_name, colour, diffuse, specular, ns);
 		GLfloat timer = 0.0f;
-		while (!glfwWindowShouldClose(window))
+		while (!glfwWindowShouldClose(window)) 
 		{
 
 			processInput(window);
@@ -652,6 +653,7 @@ main(int argc, char** argv)
 
 		}
 
+		
 		glfwDestroyWindow(window);
 		
 	}
@@ -660,14 +662,14 @@ main(int argc, char** argv)
 void processInput(GLFWwindow* window)
 {
 
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) // Close on exit
 		glfwSetWindowShouldClose(window, true),
 		cout << "Thank you for using the model loader today!" << endl,
-		cout << "Type Creeper to re-load or press n to close" << endl;
+		cout << "Type creeper to re-load" << endl;
 	
 	
-	float cameraSpeed = 2.5 * deltaTime;
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	float cameraSpeed = 2.5 * deltaTime; // Setting Camera Speed
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) 
 		cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		cameraPos -= cameraSpeed * cameraFront;
@@ -676,7 +678,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) //Allowing for line mode on holding key down
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -708,7 +710,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 
-	float sensitivity = 0.1f; // change this value to your liking
+	float sensitivity = 0.1f;
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 
